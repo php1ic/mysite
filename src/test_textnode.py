@@ -68,5 +68,21 @@ class TestSplitNodesDelimiter(unittest.TestCase):
         self.assertEqual(new_nodes, nodes)
 
 
+class TestExtractMarkdownImages(unittest.TestCase):
+    def test_example(self):
+        text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+        output = textnode.extract_markdown_images(text)
+        expected_output = [("rick roll", "https://i.imgur.com/aKaOqIh.gif"), ("obi wan", "https://i.imgur.com/fJRm4Vk.jpeg")]
+        self.assertEqual(expected_output, output)
+
+
+class TestExtractMarkdownLinks(unittest.TestCase):
+    def test_example(self):
+        text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
+        output = textnode.extract_markdown_links(text)
+        expected_output = [("to boot dev", "https://www.boot.dev"), ("to youtube", "https://www.youtube.com/@bootdotdev")]
+        self.assertEqual(expected_output, output)
+
+
 if __name__ == "__main__":
     unittest.main()

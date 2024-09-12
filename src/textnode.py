@@ -1,3 +1,5 @@
+import re
+
 import leafnode
 
 
@@ -66,3 +68,13 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
         new_nodes.extend(sub_nodes)
 
     return new_nodes
+
+
+def extract_markdown_images(text: str):
+    image_regex = r"!\[(.*?)\]\((.*?)\)"
+    return re.findall(image_regex, text)
+
+
+def extract_markdown_links(text):
+    link_regex = r"(?<!!)\[(.*?)\]\((.*?)\)"
+    return re.findall(link_regex, text)
