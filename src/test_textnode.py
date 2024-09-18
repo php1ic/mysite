@@ -84,5 +84,88 @@ class TestExtractMarkdownLinks(unittest.TestCase):
         self.assertEqual(expected_output, output)
 
 
+class TestInlineMarkdown(unittest.TestCase):
+    def test_split_image(self):
+        node = textnode.TextNode(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)",
+            textnode.text_type_text,
+        )
+        new_nodes = textnode.split_nodes_image([node])
+        self.assertListEqual(
+            [
+                textnode.TextNode("This is text with an ", textnode.text_type_text),
+                textnode.TextNode("image", textnode.text_type_image, "https://i.imgur.com/zjjcJKZ.png"),
+            ],
+            new_nodes,
+        )
+
+    def test_split_image_single(self):
+        node = textnode.TextNode(
+            "![image](https://www.example.com/image.png)",
+            textnode.text_type_text,
+        )
+        new_nodes = textnode.split_nodes_image([node])
+        self.assertListEqual(
+            [textnode.TextNode("image", textnode.text_type_image, "https://www.example.com/image.png"),],
+            new_nodes,
+        )
+
+    def test_split_images(self):
+        node = textnode.TextNode(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)",
+            textnode.text_type_text,
+        )
+        new_nodes = textnode.split_nodes_image([node])
+        self.assertListEqual(
+            [
+                textnode.TextNode("This is text with an ", textnode.text_type_text),
+                textnode.TextNode("image", textnode.text_type_image, "https://i.imgur.com/zjjcJKZ.png"),
+                textnode.TextNode(" and another ", textnode.text_type_text),
+                textnode.TextNode(
+                    "second image", textnode.text_type_image, "https://i.imgur.com/3elNhQu.png"
+                ),
+            ],
+            new_nodes,
+        )
+
+    def test_split_links(self):
+        node = textnode.TextNode(
+            "This is text with a [link](https://boot.dev) and [another link](https://blog.boot.dev) with text that follows",
+            textnode.text_type_text,
+        )
+        new_nodes = textnode.split_nodes_link([node])
+        self.assertListEqual(
+            [
+                textnode.TextNode("This is text with a ", textnode.text_type_text),
+                textnode.TextNode("link", textnode.text_type_link, "https://boot.dev"),
+                textnode.TextNode(" and ", textnode.text_type_text),
+                textnode.TextNode("another link", textnode.text_type_link, "https://blog.boot.dev"),
+                textnode.TextNode(" with text that follows", textnode.text_type_text),
+            ],
+            new_nodes,
+        )
+
+
+class TestTextToNodes(unittest.TestCase):
+    def test_from_website(self):
+        input = "This is **text** with an *italic* word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)" 
+        nodes = textnode.text_to_textnodes(input)
+
+        output = [
+            textnode.TextNode("This is ", textnode.text_type_text),
+            textnode.TextNode("text", textnode.text_type_bold),
+            textnode.TextNode(" with an ", textnode.text_type_text),
+            textnode.TextNode("italic", textnode.text_type_italic),
+            textnode.TextNode(" word and a ", textnode.text_type_text),
+            textnode.TextNode("code block", textnode.text_type_code),
+            textnode.TextNode(" and an ", textnode.text_type_text),
+            textnode.TextNode("obi wan image", textnode.text_type_image, "https://i.imgur.com/fJRm4Vk.jpeg"),
+            textnode.TextNode(" and a ", textnode.text_type_text),
+            textnode.TextNode("link", textnode.text_type_link, "https://boot.dev"),
+        ]
+
+        self.assertEqual(nodes, output)
+
+
 if __name__ == "__main__":
     unittest.main()
