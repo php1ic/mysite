@@ -20,7 +20,7 @@ def main():
     copy_fn("static", "public")
 
     print("Generating Page")
-    gencontent.generate_page("./content/index.md", "./template.html", "./public/index.html")
+    gencontent.generate_pages_recursive("./content", "./template.html", "./public")
 
 
 if __name__ == "__main__":
