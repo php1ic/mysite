@@ -1,6 +1,8 @@
 import os
 import shutil
 
+import gencontent
+
 
 def copy_fn(source, destination):
     if os.path.exists(destination):
@@ -16,6 +18,9 @@ def copy_fn(source, destination):
 
 def main():
     copy_fn("static", "public")
+
+    print("Generating Page")
+    gencontent.generate_page("./content/index.md", "./template.html", "./public/index.html")
 
 
 if __name__ == "__main__":
