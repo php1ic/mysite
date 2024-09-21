@@ -167,5 +167,78 @@ class TestTextToNodes(unittest.TestCase):
         self.assertEqual(nodes, output)
 
 
+class TestMarkdownToBlock(unittest.TestCase):
+    def test_single_block(self):
+        input = "A single string"
+        output = [input]
+
+        self.assertEqual(textnode.markdown_to_blocks(input), output)
+
+    def test_from_website(self):
+        input = """# This is a heading
+
+This is a paragraph of text. It has some **bold** and *italic* words inside of it.
+
+* This is the first list item in a list block
+* This is a list item
+* This is another list item"""
+
+        output = [
+                "# This is a heading",
+                "This is a paragraph of text. It has some **bold** and *italic* words inside of it.",
+                """* This is the first list item in a list block
+* This is a list item
+* This is another list item"""
+                ]
+
+        self.assertEqual(textnode.markdown_to_blocks(input), output)
+
+    def test_multiple_empty_lines(self):
+        input = """
+A line with text
+
+
+Another line"""
+
+        output = [
+                'A line with text',
+                'Another line'
+                ]
+
+        self.assertEqual(textnode.markdown_to_blocks(input), output)
+
+
+class TestBlockToBlockType(unittest.TestCase):
+    def test_para(self):
+        input = "Test string"
+        output = textnode.block_type_paragraph
+        self.assertEqual(textnode.block_to_block_type(input), output)
+
+    def test_heading(self):
+        input = "# Test string"
+        output = textnode.block_type_heading
+        self.assertEqual(textnode.block_to_block_type(input), output)
+
+    def test_code(self):
+        input = "```Test string\nmore stuff```"
+        output = textnode.block_type_code
+        self.assertEqual(textnode.block_to_block_type(input), output)
+
+    def test_quote(self):
+        input = "> Test string\n> Deep and meaningful"
+        output = textnode.block_type_quote
+        self.assertEqual(textnode.block_to_block_type(input), output)
+
+    def test_ulist(self):
+        input = "* Test string\n* Next item"
+        output = textnode.block_type_unordered_list
+        self.assertEqual(textnode.block_to_block_type(input), output)
+
+    def test_olist(self):
+        input = "1. Test string\n2. Next item"
+        output = textnode.block_type_ordered_list
+        self.assertEqual(textnode.block_to_block_type(input), output)
+
+
 if __name__ == "__main__":
     unittest.main()

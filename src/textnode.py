@@ -166,3 +166,62 @@ def text_to_textnodes(text):
     new_nodes = split_nodes_image(new_nodes)
 
     return new_nodes
+
+
+def markdown_to_blocks(markdown):
+    return [s.strip() for s in markdown.split('\n\n') if s != ""]
+
+
+block_type_paragraph = "paragraph"
+block_type_heading = "heading"
+block_type_code = "code"
+block_type_quote = "quote"
+block_type_unordered_list = "unordered_list"
+block_type_ordered_list = "ordered_list"
+
+
+def block_to_block_type(block: str):
+    # Empty block
+    if block == "":
+        return block_type_paragraph
+
+    # Header
+    if block.startswith('#'):
+        return block_type_heading
+
+    # Code
+    lines = block.split('\n')
+    if len(lines)> 1 and lines[0].startswith('```') and lines[-1].endswith('```'):
+        return block_type_code
+
+    # Quote: Need to check start of all lines
+    quote = True
+    for line in lines:
+        if not line.startswith('>'):
+            quote = False
+            break
+
+    if quote:
+        return block_type_quote
+
+    # Unordered list: Need to check start of all lines
+    ulist = True
+    for line in lines:
+        if not line.startswith(('* ', '- ')):
+            ulist = False
+            break
+
+    if ulist:
+        return block_type_unordered_list
+
+    # Ordered list: Need to check start of all lines
+    olist = True
+    for i, line in enumerate(lines, start=1):
+        if not line.startswith(f'{i}. '):
+            olist = False
+            break
+
+    if olist:
+        return block_type_ordered_list
+
+    return block_type_paragraph
